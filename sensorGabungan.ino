@@ -14,6 +14,11 @@ const char* password = "JinanGracia";
 #define CHAT_ID "5393911117"
 #define BOTtoken "6705741560:AAETk-tsNg4bh7zN3a_uqcXabBDgjMzY4FI"
 
+WiFiClientSecure client;
+UniversalTelegramBot bot(BOTtoken, client);
+int botRequestDelay = 1000;
+unsigned long lastTimeBotRan;
+
 void setup() {
   // put your setup code here, to run once:
     Serial.begin(115200);
@@ -21,7 +26,7 @@ void setup() {
     Serial.println(ssid);
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
-    Client.setCACert(TELEGRAM_CERTIFICATE_ROOT);
+    client.setCACert(TELEGRAM_CERTIFICATE_ROOT);
 
     while(WiFi.status() != WL_CONNECTED){
        Serial.print(".");
@@ -54,5 +59,24 @@ void loop() {
   Serial.print("Kelembapan air tahan: ");
   Serial.print(M); /*print kelembapan air*/
   Serial.print(" %");
-  delay(2000);
+  bot.sendMessage(CHAT_ID, "MONITORING TANAMAN SMKN7 BALEENDAH");
+  //delay(2000);
+  kirimPesanTelegram(h,t,M);
 }
+
+void kirimPesanTelegram(float h, float t, float M){
+  String pesan = "Suhu saat in: " + String(t, 2) + "C\n" +
+  "Humiditas udara saat ini: " + String(h, 2) + "%\n" + 
+  "Tingkat kelembapan tanah saat ini: " + (M) + "%\n";
+
+  if(bot.sendMessage(CHAT_ID, pesan, "Markdon")){
+    Serial.println("Pesan berhasil terkirim");
+  } else {
+    Serial.println("Gagal terkirim");
+  }
+  delay(1000);
+}
+
+
+
+
